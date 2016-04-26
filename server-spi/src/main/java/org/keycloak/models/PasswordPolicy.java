@@ -87,6 +87,12 @@ public class PasswordPolicy implements Serializable {
                     policies.add(new PasswordHistory(arg, this));
                 } else if (name.equals(ForceExpiredPasswordChange.NAME)) {
                     policies.add(new ForceExpiredPasswordChange(arg));
+                } else if (name.equals(PasswordSaltLength.NAME)) {
+                    policies.add(new PasswordSaltLength(arg));
+                } else if (name.equals(HashMemoryCost.NAME)) {
+                    policies.add(new HashMemoryCost(arg));
+                } else if (name.equals(HashParallelism.NAME)) {
+                    policies.add(new HashParallelism(arg));
                 } else {
                     throw new IllegalArgumentException("Unsupported policy");
                 }
@@ -124,6 +130,54 @@ public class PasswordPolicy implements Serializable {
 
     /**
      *
+     * @return -1 if no salt length setting
+     */
+    public int getPasswordSaltLength() {
+        if (policies == null)
+            return -1;
+        for (Policy p : policies) {
+            if (p instanceof PasswordSaltLength) {
+                return ((PasswordSaltLength) p).saltLen;
+            }
+
+        }
+        return -1;
+    }
+
+    /**
+     *
+     * @return -1 if no memory cost setting
+     */
+    public int getHashMemoryCost() {
+        if (policies == null)
+            return -1;
+        for (Policy p : policies) {
+            if (p instanceof HashMemoryCost) {
+                return ((HashMemoryCost) p).memCost;
+            }
+
+        }
+        return -1;
+    }
+
+    /**
+     *
+     * @return -1 if no parallelism setting
+     */
+    public int getHashParallelism() {
+        if (policies == null)
+            return -1;
+        for (Policy p : policies) {
+            if (p instanceof HashParallelism) {
+                return ((HashParallelism) p).parallelism;
+            }
+
+        }
+        return -1;
+    }
+
+    /**
+     *
      * @return -1 if no expired passwords setting
      */
     public int getExpiredPasswords() {
@@ -137,7 +191,7 @@ public class PasswordPolicy implements Serializable {
         }
         return -1;
     }
-    
+
     /**
     *
     * @return -1 if no force expired password change setting
@@ -163,7 +217,7 @@ public class PasswordPolicy implements Serializable {
         }
         return null;
     }
-    
+
     public Error validate(KeycloakSession session, String user, String password) {
         for (Policy p : policies) {
             Error error = p.validate(session, user, password);
@@ -204,12 +258,12 @@ public class PasswordPolicy implements Serializable {
         public HashAlgorithm(String arg) {
             algorithm = stringArg(NAME, Constants.DEFAULT_HASH_ALGORITHM, arg);
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, String user, String password) {
             return null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return null;
@@ -245,7 +299,7 @@ public class PasswordPolicy implements Serializable {
         public Error validate(KeycloakSession session, String username, String password) {
             return username.equals(password) ? new Error(INVALID_PASSWORD_NOT_USERNAME) : null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return validate(session, user.getUsername(), password);
@@ -260,13 +314,13 @@ public class PasswordPolicy implements Serializable {
         {
             min = intArg(NAME, 8, arg);
         }
-        
+
 
         @Override
         public Error validate(KeycloakSession session, String username, String password) {
             return password.length() < min ? new Error(INVALID_PASSWORD_MIN_LENGTH_MESSAGE, min) : null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return validate(session, user.getUsername(), password);
@@ -281,7 +335,7 @@ public class PasswordPolicy implements Serializable {
         {
             min = intArg(NAME, 1, arg);
         }
-        
+
 
         @Override
         public Error validate(KeycloakSession session, String username, String password) {
@@ -293,7 +347,7 @@ public class PasswordPolicy implements Serializable {
             }
             return count < min ? new Error(INVALID_PASSWORD_MIN_DIGITS_MESSAGE, min) : null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return validate(session, user.getUsername(), password);
@@ -308,7 +362,7 @@ public class PasswordPolicy implements Serializable {
         {
             min = intArg(NAME, 1, arg);
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, String username, String password) {
             int count = 0;
@@ -319,7 +373,7 @@ public class PasswordPolicy implements Serializable {
             }
             return count < min ? new Error(INVALID_PASSWORD_MIN_LOWER_CASE_CHARS_MESSAGE, min) : null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return validate(session, user.getUsername(), password);
@@ -344,7 +398,7 @@ public class PasswordPolicy implements Serializable {
             }
             return count < min ? new Error(INVALID_PASSWORD_MIN_UPPER_CASE_CHARS_MESSAGE, min) : null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return validate(session, user.getUsername(), password);
@@ -359,7 +413,7 @@ public class PasswordPolicy implements Serializable {
         {
             min = intArg(NAME, 1, arg);
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, String username, String password) {
             int count = 0;
@@ -370,7 +424,7 @@ public class PasswordPolicy implements Serializable {
             }
             return count < min ? new Error(INVALID_PASSWORD_MIN_SPECIAL_CHARS_MESSAGE, min) : null;
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, UserModel user, String password) {
             return validate(session, user.getUsername(), password);
@@ -412,7 +466,7 @@ public class PasswordPolicy implements Serializable {
             this.passwordPolicy = passwordPolicy;
             passwordHistoryPolicyValue = intArg(NAME, 3, arg);
         }
-        
+
         @Override
         public Error validate(KeycloakSession session, String user, String password) {
             return null;
@@ -476,7 +530,7 @@ public class PasswordPolicy implements Serializable {
             return credentialModels;
         }
     }
-    
+
     private static class ForceExpiredPasswordChange implements Policy {
         private static final String NAME = "forceExpiredPasswordChange";
         private int daysToExpirePassword;
@@ -495,7 +549,64 @@ public class PasswordPolicy implements Serializable {
             return null;
         }
     }
-    
+
+    private static class PasswordSaltLength implements Policy {
+        private static final String NAME = "passwordSaltLength";
+        private int saltLen;
+
+        public PasswordSaltLength(String arg) {
+            saltLen = intArg(NAME, 8, arg);
+        }
+
+        @Override
+        public Error validate(KeycloakSession session, String username, String password) {
+            return null;
+        }
+
+        @Override
+        public Error validate(KeycloakSession session, UserModel user, String password) {
+            return null;
+        }
+    }
+
+    private static class HashMemoryCost implements Policy {
+        private static final String NAME = "hashMemoryCost";
+        private int memCost;
+
+        public HashMemoryCost(String arg) {
+            memCost = intArg(NAME, 4096, arg);
+        }
+
+        @Override
+        public Error validate(KeycloakSession session, String username, String password) {
+            return null;
+        }
+
+        @Override
+        public Error validate(KeycloakSession session, UserModel user, String password) {
+            return null;
+        }
+    }
+
+    private static class HashParallelism implements Policy {
+        private static final String NAME = "hashParallelism";
+        private int parallelism;
+
+        public HashParallelism(String arg) {
+            parallelism = intArg(NAME, 1, arg);
+        }
+
+        @Override
+        public Error validate(KeycloakSession session, String username, String password) {
+            return null;
+        }
+
+        @Override
+        public Error validate(KeycloakSession session, UserModel user, String password) {
+            return null;
+        }
+    }
+
     private static int intArg(String policy, int defaultValue, String arg) {
         if (arg == null) {
             return defaultValue;

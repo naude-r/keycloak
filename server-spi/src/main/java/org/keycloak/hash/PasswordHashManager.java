@@ -42,7 +42,7 @@ public class PasswordHashManager {
             log.warnv("Could not find hash provider {0} from password policy, using default provider {1}", algorithm, Constants.DEFAULT_HASH_ALGORITHM);
             provider = session.getProvider(PasswordHashProvider.class, Constants.DEFAULT_HASH_ALGORITHM);
         }
-        return provider.encode(rawPassword, iterations);
+        return provider.encode(rawPassword, passwordPolicy);
     }
 
     public static boolean verify(KeycloakSession session, RealmModel realm, String password, UserCredentialValueModel credential) {

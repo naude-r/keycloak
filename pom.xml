@@ -163,6 +163,7 @@
         <module>core</module>
         <module>dependencies</module>
         <module>server-spi</module>
+        <module>argon2d_hash</module>
         <module>saml-core-api</module>
         <module>saml-core</module>
         <module>proxy</module>
