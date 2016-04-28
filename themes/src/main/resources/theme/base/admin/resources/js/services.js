@@ -1251,7 +1251,10 @@ module.factory('PasswordPolicy', function() {
         notUsername:    	"Block passwords that are equal to the username",
         regexPattern:  	    "Block passwords that do not match the regex pattern (string type).",
         passwordHistory:  	"Block passwords that are equal to previous passwords. Default value is 3.",
-        forceExpiredPasswordChange:  	"Force password change when password credential is expired. Default value is 365 days."
+        forceExpiredPasswordChange:  	"Force password change when password credential is expired. Default value is 365 days.",
+        passwordSaltLength: "Length of the password salt. Default is 8.",
+        hashMemoryCost: "Argon2 memory cost. Default is 65536.",
+        hashParallelism: "Argon2 parallelism cost. Default is 2."
     }
 
     p.allPolicies = [
@@ -1265,7 +1268,10 @@ module.factory('PasswordPolicy', function() {
         { name: 'notUsername', value: 1 },
         { name: 'regexPattern', value: ''},
         { name: 'passwordHistory', value: 3 },
-        { name: 'forceExpiredPasswordChange', value: 365 }
+        { name: 'forceExpiredPasswordChange', value: 365 },
+        { name: 'passwordSaltLength', value: 8 },
+        { name: 'hashMemoryCost', value: 65536},
+        { name: 'hashParallelism', value: 2}
     ];
 
     p.parse = function(policyString) {
