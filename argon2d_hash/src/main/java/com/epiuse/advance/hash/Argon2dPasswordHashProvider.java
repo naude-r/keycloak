@@ -39,10 +39,10 @@ public class Argon2dPasswordHashProvider implements PasswordHashProviderFactory,
     public static final String ID = "argon2d";
 
     public UserCredentialValueModel encode(final String rawPassword, final PasswordPolicy policy) {
-        int saltLen = Math.min(8, policy.getPasswordSaltLength());
-        int iterations = Math.min(20, policy.getHashIterations());
-        int memCost = Math.min(65536, policy.getHashMemoryCost());
-        int parallelism = Math.min(2, policy.getHashParallelism());
+        int saltLen = Math.max(8, policy.getPasswordSaltLength());
+        int iterations = Math.max(20, policy.getHashIterations());
+        int memCost = Math.max(65536, policy.getHashMemoryCost());
+        int parallelism = Math.max(2, policy.getHashParallelism());
         final Argon2 argon = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2d, saltLen, Argon2Constants.DEFAULT_HASH_LENGTH);
         String encodedPassword = argon.hash(iterations, memCost, parallelism, rawPassword);
 
