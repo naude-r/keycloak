@@ -30,6 +30,17 @@
     <artifactId>argon2d-hash-provider</artifactId>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-phxql-maven</id>
+            <name>bintray</name>
+            <url>https://dl.bintray.com/phxql/maven</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -49,7 +60,7 @@
         <dependency>
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
