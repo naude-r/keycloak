@@ -90,11 +90,13 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder role(String role) {
+    public UserBuilder addRoles(String... roles) {
         if (rep.getRealmRoles() == null) {
             rep.setRealmRoles(new ArrayList<String>());
         }
-        rep.getRealmRoles().add(role);
+        for (String role : roles) {
+            rep.getRealmRoles().add(role);
+        }
         return this;
     }
 
@@ -122,17 +124,30 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder totpSecret(String totpSecret) {
+    public UserBuilder secret(String type, String secret) {
         if (rep.getCredentials() == null) {
             rep.setCredentials(new LinkedList<CredentialRepresentation>());
         }
 
         CredentialRepresentation credential = new CredentialRepresentation();
-        credential.setType(CredentialRepresentation.TOTP);
-        credential.setValue(totpSecret);
+        credential.setType(type);
+        credential.setValue(secret);
 
         rep.getCredentials().add(credential);
         rep.setTotp(true);
+        return this;
+    }
+
+    public UserBuilder totpSecret(String totpSecret) {
+        return secret(CredentialRepresentation.TOTP, totpSecret);
+    }
+
+    public UserBuilder hotpSecret(String hotpSecret) {
+        return secret(CredentialRepresentation.HOTP, hotpSecret);
+    }
+
+    public UserBuilder otpEnabled() {
+        rep.setTotp(Boolean.TRUE);
         return this;
     }
 

@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.keycloak.testsuite</groupId>
         <artifactId>integration-arquillian-tests-adapters</artifactId>
-        <version>1.9.3.Final-SNAPSHOT</version>
+        <version>1.9.5.Final-SNAPSHOT</version>
     </parent>
 
     <artifactId>integration-arquillian-tests-adapters-karaf</artifactId>
@@ -130,6 +130,12 @@
             <id>app-server-fuse62</id>
             <modules>
                 <module>fuse62</module>
+            </modules>
+        </profile>                
+        <profile>
+            <id>app-server-fuse63</id>
+            <modules>
+                <module>fuse63</module>
             </modules>
         </profile>                
         

@@ -3,10 +3,16 @@ package org.keycloak.testsuite.util;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import static org.keycloak.testsuite.admin.ApiUtil.findClientByClientId;
+import static org.keycloak.testsuite.admin.ApiUtil.findProtocolMapperByName;
 
 /**
  * @author <a href="mailto:bruno@abstractj.org">Bruno Oliveira</a>.
@@ -59,6 +65,54 @@ public class ClientManager {
         public void directAccessGrant(Boolean enable) {
             ClientRepresentation app = clientResource.toRepresentation();
             app.setDirectAccessGrantsEnabled(enable);
+            clientResource.update(app);
+        }
+
+        public void fullScopeAllowed(boolean enable) {
+            ClientRepresentation app = clientResource.toRepresentation();
+            app.setFullScopeAllowed(enable);
+            clientResource.update(app);
+        }
+
+        public void consentRequired(boolean enable) {
+            ClientRepresentation app = clientResource.toRepresentation();
+            app.setConsentRequired(enable);
+            clientResource.update(app);
+        }
+
+        public ClientManagerBuilder addProtocolMapper(ProtocolMapperRepresentation protocolMapper) {
+            clientResource.getProtocolMappers().createMapper(protocolMapper);
+            return this;
+        }
+
+        public void addScopeMapping(RoleRepresentation newRole) {
+            clientResource.getScopeMappings().realmLevel().add(Collections.singletonList(newRole));
+        }
+
+        public ClientManagerBuilder removeProtocolMapper(String protocolMapperName) {
+            ProtocolMapperRepresentation rep = findProtocolMapperByName(clientResource, protocolMapperName);
+            clientResource.getProtocolMappers().delete(rep.getId());
+            return this;
+        }
+
+        public void removeScopeMapping(RoleRepresentation newRole) {
+            clientResource.getScopeMappings().realmLevel().remove(Collections.singletonList(newRole));
+        }
+
+        public void addRedirectUris(String... redirectUris) {
+            ClientRepresentation app = clientResource.toRepresentation();
+            if (app.getRedirectUris() == null) {
+                app.setRedirectUris(new LinkedList<String>());
+            }
+            app.setRedirectUris(Arrays.asList(redirectUris));
+            clientResource.update(app);
+        }
+
+        public void removeRedirectUris(String... redirectUris) {
+            ClientRepresentation app = clientResource.toRepresentation();
+            for (String redirectUri : redirectUris) {
+                app.getRedirectUris().remove(redirectUri);
+            }
             clientResource.update(app);
         }
     }

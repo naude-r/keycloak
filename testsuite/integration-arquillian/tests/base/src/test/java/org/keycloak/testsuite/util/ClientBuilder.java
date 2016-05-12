@@ -17,6 +17,7 @@
 
 package org.keycloak.testsuite.util;
 
+import org.keycloak.dom.saml.v2.ac.BooleanType;
 import org.keycloak.representations.idm.ClientRepresentation;
 
 import java.util.Arrays;
@@ -43,6 +44,11 @@ public class ClientBuilder {
         return this;
     }
 
+    public ClientBuilder name(String name) {
+        rep.setName(name);
+        return this;
+    }
+
     public ClientBuilder clientId(String clientId) {
         rep.setClientId(clientId);
         return this;
@@ -53,8 +59,18 @@ public class ClientBuilder {
         return this;
     }
 
+    public ClientBuilder serviceAccount() {
+        rep.setServiceAccountsEnabled(true);
+        return this;
+    }
+
     public ClientBuilder directAccessGrants() {
         rep.setDirectAccessGrantsEnabled(true);
+        return this;
+    }
+
+    public ClientBuilder fullScopeEnabled(Boolean fullScopeEnabled) {
+        rep.setFullScopeAllowed(fullScopeEnabled);
         return this;
     }
 
@@ -86,6 +102,21 @@ public class ClientBuilder {
 
     public ClientBuilder redirectUris(String... redirectUris) {
         rep.setRedirectUris(Arrays.asList(redirectUris));
+        return this;
+    }
+
+    public ClientBuilder baseUrl(String baseUrl) {
+        rep.setBaseUrl(baseUrl);
+        return this;
+    }
+
+    public ClientBuilder adminUrl(String adminUrl) {
+        rep.setAdminUrl(adminUrl);
+        return this;
+    }
+
+    public ClientBuilder rootUrl(String rootUrl) {
+        rep.setRootUrl(rootUrl);
         return this;
     }
 }

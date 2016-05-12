@@ -54,7 +54,6 @@ import org.keycloak.testsuite.arquillian.AuthServerTestEnricher;
 import org.keycloak.testsuite.arquillian.SuiteContext;
 import org.keycloak.testsuite.auth.page.WelcomePage;
 import org.keycloak.testsuite.client.KeycloakTestingClient;
-import org.keycloak.testsuite.util.DeleteMeOAuthClient;
 import org.keycloak.testsuite.util.OAuthClient;
 import org.openqa.selenium.WebDriver;
 import org.keycloak.testsuite.auth.page.AuthServer;
@@ -96,8 +95,6 @@ public abstract class AbstractKeycloakTest {
     @ArquillianResource
     protected OAuthClient oauth;
 
-    protected DeleteMeOAuthClient deleteMeOAuthClient;
-
     protected List<RealmRepresentation> testRealmReps;
 
     @Drone
@@ -131,7 +128,6 @@ public abstract class AbstractKeycloakTest {
     public void beforeAbstractKeycloakTest() throws Exception {
         adminClient = Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",
                 MASTER, ADMIN, ADMIN, Constants.ADMIN_CLI_CLIENT_ID);
-        deleteMeOAuthClient = new DeleteMeOAuthClient(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth");
 
         getTestingClient();
 
@@ -151,8 +147,7 @@ public abstract class AbstractKeycloakTest {
 
         importTestRealms();
 
-        oauth.setAdminClient(adminClient);
-        oauth.setDriver(driver);
+        oauth.init(adminClient, driver);
     }
 
     @After
@@ -161,8 +156,8 @@ public abstract class AbstractKeycloakTest {
             resetTimeOffset();
         }
 
-//        removeTestRealms(); // keeping test realms after test to be able to inspect failures, instead deleting existing realms before import
-//        adminClient.close(); // keeping admin connection open
+        removeTestRealms(); // Remove realms after tests. Tests should cleanup after themselves!
+        adminClient.close(); // don't keep admin connection open
     }
 
     private void updateMasterAdminPassword() {
@@ -243,7 +238,10 @@ public abstract class AbstractKeycloakTest {
     }
 
     public void removeRealm(RealmRepresentation realm) {
-        adminClient.realms().realm(realm.getRealm()).remove();
+        try {
+            adminClient.realms().realm(realm.getRealm()).remove();
+        } catch (NotFoundException e) {
+        }
     }
     
     public RealmsResource realmsResouce() {

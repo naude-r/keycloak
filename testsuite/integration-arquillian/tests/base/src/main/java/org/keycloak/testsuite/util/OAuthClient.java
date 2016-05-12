@@ -72,17 +72,17 @@ public class OAuthClient {
 
     private String baseUrl = AUTH_SERVER_ROOT;
 
-    private String realm = "test";
+    private String realm;
 
-    private String clientId = "test-app";
+    private String clientId;
 
-    private String redirectUri = APP_ROOT + "/auth";
+    private String redirectUri;
 
-    private String state = "mystate";
+    private String state;
 
     private String scope;
 
-    private String uiLocales = null;
+    private String uiLocales;
 
     private String clientSessionState;
 
@@ -90,12 +90,19 @@ public class OAuthClient {
 
     private Map<String, PublicKey> publicKeys = new HashMap<>();
 
-    public void setAdminClient(Keycloak adminClient) {
+    public void init(Keycloak adminClient, WebDriver driver) {
         this.adminClient = adminClient;
-    }
-
-    public void setDriver(WebDriver driver) {
         this.driver = driver;
+
+        baseUrl = AUTH_SERVER_ROOT;
+        realm = "test";
+        clientId = "test-app";
+        redirectUri = APP_ROOT + "/auth";
+        state = "mystate";
+        scope = null;
+        uiLocales = null;
+        clientSessionState = null;
+        clientSessionHost = null;
     }
 
     public AuthorizationCodeResponse doLogin(String username, String password) {
@@ -115,10 +122,15 @@ public class OAuthClient {
 
     public void doLoginGrant(String username, String password) {
         openLoginForm();
-
-        driver.findElement(By.id("username")).sendKeys(username);
-        driver.findElement(By.id("password")).sendKeys(password);
-        driver.findElement(By.name("login")).click();
+        String src = driver.getPageSource();
+        try {
+            driver.findElement(By.id("username")).sendKeys(username);
+            driver.findElement(By.id("password")).sendKeys(password);
+            driver.findElement(By.name("login")).click();
+        } catch (Throwable t) {
+            System.err.println(src);
+            throw t;
+        }
     }
 
     public AccessTokenResponse doAccessTokenRequest(String code, String password) {

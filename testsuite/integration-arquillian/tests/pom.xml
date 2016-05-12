@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.keycloak.testsuite</groupId>
         <artifactId>integration-arquillian</artifactId>
-        <version>1.9.3.Final-SNAPSHOT</version>
+        <version>1.9.5.Final-SNAPSHOT</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -866,6 +866,11 @@
                     <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
                     <version>${postgresql.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.mariadb.jdbc</groupId>
+                    <artifactId>mariadb-java-client</artifactId>
+                    <version>${mariadb.version}</version>
                 </dependency>
 
             </dependencies>

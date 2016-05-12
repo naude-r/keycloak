@@ -23,6 +23,7 @@ import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -90,6 +91,19 @@ public class ApiUtil {
         return client.roles().get(role);
     }
 
+    public static ProtocolMapperRepresentation findProtocolMapperByName(ClientResource client, String name) {
+        for (ProtocolMapperRepresentation p : client.getProtocolMappers().getMappers()) {
+            if (p.getName().equals(name)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public static RoleResource findRealmRoleByName(RealmResource realm, String role) {
+        return realm.roles().get(role);
+    }
+
     public static UserRepresentation findUserByUsername(RealmResource realm, String username) {
         UserRepresentation user = null;
         List<UserRepresentation> ur = realm.users().search(username, null, null);
@@ -143,7 +157,7 @@ public class ApiUtil {
             }
 
             UserResource userResource = realm.users().get(userId);
-            log.debug("assigning roles: " + Arrays.toString(roles) + " to user: \""
+            log.debug("assigning role: " + Arrays.toString(roles) + " to user: \""
                     + userResource.toRepresentation().getUsername() + "\" of client: \""
                     + clientName + "\" in realm: \"" + realmName + "\"");
             userResource.roles().clientLevel(clientId).add(roleRepresentations);
